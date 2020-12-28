@@ -1,0 +1,13 @@
+li.correct::after {
+    content: '...correct!';
+}
+
+li.wrong::after {
+    content: '...wrong!';
+}
+
+#btn.disabled {
+    background: #ccc;
+    box-shadow: 0 4px 0 #bbb;
+    opacity: 0.7;
+}
