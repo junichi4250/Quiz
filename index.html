@@ -16,8 +16,10 @@
 'use strict';
 
 {
+    // 現在の問題が何番目か
     let currentNum = 0;
-    let count = 0;
+    // 選択肢が選ばれているかどうかを判定する
+    let isAnswered = false;
     const btn = document.getElementById('btn');
     const question = document.getElementById('question');
     const choices = document.getElementById('choices');
@@ -25,76 +27,94 @@
     const quizSet = [
         {q:'鎌倉幕府ができた年は？', c:['1192年', '1195年', '1198年']},
         {q:'日本で一番大きな山は？', c:['富士山', '比叡山', '阿蘇山']},
+        {q:'コーヒーの価格が一番安いお店は？', c:['ベローチェ', 'スタバ', 'サンマルク']},
     ];
 
-    question.textContent = quizSet[currentNum].q;
+    // クイズを開始
+    setQuiz();
 
-    quizSet[currentNum].c.forEach(choice => {
-        const li = document.createElement('li');
-        li.textContent = choice;
-        choices.appendChild(li);
-        li.addEventListener('click', () => {
-            checkAnswer(li);
-        });
-        
+    // nextボタンをクリックした時の処理
+    btn.addEventListener('click', () => {
+    // btnがdisabledを持っていたら押せない
+        if (btn.classList.contains('disabled')) {
+          return;
+        };
+    // nextボタンを非活性にする
+        btn.classList.add('disabled');
+    // 次の問題をセットする
+        reset();
     });
 
-    function checkAnswer(li) {
-        if (li.textContent === quizSet[currentNum].c[0]) {
-            li.classList.add('correct');
-        } else {
-            li.classList.add('wrong');
-        }
 
-        disabled();
-    }
-
-    btn.addEventListener('click', () => {
-        currentNum++;
-        setQuiz();
-    })
-
-
-    // const a = document.getElementById('a');
-    // a.addEventListener('click', () => {
-    //     a.classList.add('correct');
-    //     disabled();
-    //     count++;
-        
-    // });
-    // const b = document.getElementById('b');
-    // b.addEventListener('click', () => {
-    //     b.classList.add('wrong');
-    //     disabled();
-    //     count++;
-    // });
-    // const c = document.getElementById('c');
-    // c.addEventListener('click', () => {
-    //     c.classList.add('wrong');
-    //     disabled();
-    //     count++;
-    // });
-
-    function disabled() {
-        btn.classList.remove('disabled');
-    }
 
     function setQuiz() {
+      　// 問題文を表示
         question.textContent = quizSet[currentNum].q;
 
-    quizSet[currentNum].c.forEach(choice => {
+        // choicesが最初の子要素liを持っているなら削除する
+        while (choices.firstChild) {
+          choices.removeChild(choices.firstChild);
+        }
+
+        // 選択肢をランダムな順番で表示する
+        const shuffledChoices = shuffle([...quizSet[currentNum].c]);
+
+        // 選択肢を表示
+        shuffledChoices.forEach(choice => {
+        // liの作成
         const li = document.createElement('li');
+        // 選択肢の文を表示
         li.textContent = choice;
+        // HTMLにliを追加
         choices.appendChild(li);
+        // 選択肢をクリックした時に正解かを判定
         li.addEventListener('click', () => {
             checkAnswer(li);
         });
-        
+
     });
+  }
+
+  // 選択が正解かどうか判定
+  function checkAnswer(li) {
+      // true:選択済、false:未選択
+      if (isAnswered) {
+        return;
+      } else {
+        isAnswered = true;
+      }
+
+      if (li.textContent === quizSet[currentNum].c[0]) {
+          li.classList.add('correct');
+      } else {
+          li.classList.add('wrong');
+      }
+      // 次へ進むボタンを活性にする
+      disabled();
+  }
+
+  function disabled() {
+      btn.classList.remove('disabled');
+  }
+
+  function reset() {
+    isAnswered = false;
+    currentNum++;
+    if (currentNum === quizSet.length) {
+      currentNum = 0;
     }
+    setQuiz();
+  }
 
+  // フィッシャーイエーツのシャッフル
+  // 配列を渡すと中身をシャッフルして返す
+  function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0 ; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    return arr;
+  }
 }
-
-
 </script>
 </html>
